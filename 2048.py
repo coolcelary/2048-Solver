@@ -1,5 +1,7 @@
 import logic
+import AI_Solver
 import sys
+import time
 
 # Cross-platform single-key input setup
 try:
@@ -32,14 +34,28 @@ if __name__ == '__main__':
     # Initialize the matrix
     mat = logic.start_game()
 
+    mode = input("Type 'ai' to make computer play game. Type anything else to play manually.").lower()
+    if mode != 'ai':
+        # printing controls for user
+        print("Commands are as follows : ")
+        print("'W' or 'w' : Move Up")
+        print("'S' or 's' : Move Down")
+        print("'A' or 'a' : Move Left")
+        print("'D' or 'd' : Move Right")
+
+
     while True:
         print("\nCurrent Board:")
         for row in mat:
             print('\t'.join(str(num) for num in row))
         print()
-
-        print("Press a key (W/A/S/D to move, Q to quit): ", end='', flush=True)
-        x = get_key()
+        if mode == 'ai':
+            x = AI_Solver.expectimax_decision(mat)
+            time.sleep(0.2)
+        else:
+            print("Press a key (W/A/S/D to move, Q to quit): ", end='', flush=True)
+            x = get_key()
+        
         print(x.upper())
 
         if x.lower() == 'q':
@@ -70,11 +86,11 @@ if __name__ == '__main__':
             if has_empty_cell(prev_mat):
                 logic.add_new_2(mat)
 
-        # ✅ Always check current state, even if move didn’t change the board
+        # Always check current state, even if move didn’t change the board
         status = logic.get_current_state(mat)
 
         if status == 'WON':
-            print("\nYou reached 2048! 🎉 You won!")
+            print("\nYou reached 2048! You won!")
             break
         elif status == 'LOST':
             print("\nNo more moves left. Game Over!")
