@@ -27,23 +27,24 @@ def findEmpty(mat):
 # function to add a new 2 in
 # grid at any random empty cell
 def add_new_2(mat):
-    """Adds a new '2' in a random empty cell in the grid."""
-    if all(all(cell != 0 for cell in row) for row in mat):  
-        return  # No empty space left, avoid infinite loop
+    """Adds a new '2' or '4' in a random empty cell in the grid (2 = 90%, 4 = 10%)."""
+    if all(all(cell != 0 for cell in row) for row in mat):
+        return  # No empty space left
 
     tries = 0
     while tries < 30:
         r = random.randint(0, 3)
         c = random.randint(0, 3)
         if mat[r][c] == 0:
-            mat[r][c] = 2
-            return  # Successfully placed a '2'
+            mat[r][c] = 4 if random.random() < 0.1 else 2  # 10% chance of 4
+            return
         tries += 1
 
     # If random placement fails too many times, find an empty cell manually
     r, c = findEmpty(mat)
     if r is not None and c is not None:
-        mat[r][c] = 2
+        mat[r][c] = 4 if random.random() < 0.1 else 2
+
 
 # function to get the current
 # state of game

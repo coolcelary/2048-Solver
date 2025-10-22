@@ -30,6 +30,15 @@ def expectimax_decision(mat, depth: int = 4):
     best_move = None
     best_score = -math.inf
 
+    empty_count = len(_empty_cells(mat))
+    if empty_count > 6:
+        max_depth = 3
+    elif empty_count > 3:
+        max_depth = 4
+    else:
+        max_depth = 5
+
+
     for move_key, move_fn in moves.items():
         grid_copy = copy.deepcopy(mat)
         new_grid, moved = move_fn(grid_copy)
@@ -38,7 +47,7 @@ def expectimax_decision(mat, depth: int = 4):
             continue  # skip illegal moves that don't change the grid
 
         # Chance layer after player moves (a random tile will be added)
-        score = _expectimax_value(new_grid, depth - 1, is_chance_node=True)
+        score = _expectimax_value(new_grid, max_depth - 1, is_chance_node=True)
 
         if score > best_score:
             best_score = score
@@ -68,9 +77,9 @@ def _expectimax_value(grid, depth: int, is_chance_node: bool):
             return _evaluate(grid)
 
         # In the user's logic.py, add_new_2 only spawns 2s.
-        # We'll model that exactly (probability 1.0 of spawning a 2). If you later
+        # We'll model that exactly. If you later
         # add 4s in logic.py, adjust `candidates` accordingly (e.g., [(2, 0.9), (4, 0.1)]).
-        candidates = [(2, 1.0)]
+        candidates = [(2, 0.9), (4, 0.1)]
 
         expected = 0.0
         p_cell = 1.0 / len(empties)  # equal chance to pick any empty cell
@@ -123,10 +132,10 @@ def _evaluate(grid) -> float:
     # Weighted sum (tuned with simple trial; feel free to tweak)
     return (
         12.0 * empties +
-        1.5  * log_max +
-        1.0  * mono +
-        0.1  * smooth +
-        2.0  * corner
+        2.0  * log_max +
+        1.8  * mono +
+        0.3  * smooth +
+        8.0  * corner
     )
 
 
@@ -172,8 +181,12 @@ def _smoothness(grid) -> float:
             # Down neighbor
             if i + 1 < 4 and grid[i+1][j] != 0:
                 penalty += abs(v - math.log(grid[i+1][j], 2))
-    return -penalty
+    return -penalty / 16.0
 
+
+#def _max_in_corner_bonus(grid, max_tile) -> float:
+    # prefer bottom-right corner specifically
+   # return 1.0 if grid[0][0] == max_tile else 0.0
 
 def _max_in_corner_bonus(grid, max_tile) -> float:
     corners = [(0,0), (0,3), (3,0), (3,3)]

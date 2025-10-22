@@ -1,5 +1,6 @@
 import logic
 import AI_Solver
+import AI_Test
 import sys
 import time
 
@@ -50,8 +51,8 @@ if __name__ == '__main__':
             print('\t'.join(str(num) for num in row))
         print()
         if mode == 'ai':
-            x = AI_Solver.expectimax_decision(mat)
-            time.sleep(0.2)
+            x = AI_Test.expectimax_decision(mat)
+            #time.sleep(0.05)
         else:
             print("Press a key (W/A/S/D to move, Q to quit): ", end='', flush=True)
             x = get_key()
