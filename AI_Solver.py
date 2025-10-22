@@ -1,10 +1,6 @@
 """
 This module implements AI logic for the 2048 game using the Expectimax algorithm.
 It interacts with the game mechanics defined in logic.py.
-
-You can import this into 2048.py and call:
-    move = ai.expectimax_decision(mat)
-to let the AI choose the best move automatically.
 """
 
 import logic
