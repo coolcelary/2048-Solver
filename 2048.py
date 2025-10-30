@@ -3,6 +3,7 @@ import AI_Solver
 import AI_Test
 import sys
 import time
+import os
 
 # Cross-platform single-key input setup
 try:
@@ -46,6 +47,7 @@ if __name__ == '__main__':
 
 
     while True:
+        os.system('clear')
         print("\nCurrent Board:")
         for row in mat:
             print('\t'.join(str(num) for num in row))
@@ -96,3 +98,4 @@ if __name__ == '__main__':
         elif status == 'LOST':
             print("\nNo more moves left. Game Over!")
             break
+        time.sleep(0.1)
