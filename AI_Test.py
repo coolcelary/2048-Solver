@@ -1,25 +1,8 @@
-"""
-This module implements AI logic for the 2048 game using the Expectimax algorithm.
-It interacts with the game mechanics defined in logic.py.
-
-You can import this into 2048.py and call:
-    move = expectimax_decision(mat)
-to let the AI choose the best move automatically.
-"""
-
 import copy
 import math
 import logic
 
-# -----------------------------
-# Public entry point
-# -----------------------------
-
 def expectimax_decision(mat, depth: int = 4):
-    """
-    Returns the best move ('w', 'a', 's', 'd') for the given board state using Expectimax.
-    If no moves are possible, returns None.
-    """
     moves = {
         'w': logic.move_up,
         'a': logic.move_left,
@@ -32,11 +15,11 @@ def expectimax_decision(mat, depth: int = 4):
 
     empty_count = len(_empty_cells(mat))
     if empty_count > 6:
-        max_depth = 3
-    elif empty_count > 3:
         max_depth = 4
-    else:
+    elif empty_count > 3:
         max_depth = 5
+    else:
+        max_depth = 6
 
 
     for move_key, move_fn in moves.items():
@@ -44,7 +27,7 @@ def expectimax_decision(mat, depth: int = 4):
         new_grid, moved = move_fn(grid_copy)
 
         if not moved:
-            continue  # skip illegal moves that don't change the grid
+            continue
 
         # Chance layer after player moves (a random tile will be added)
         score = _expectimax_value(new_grid, max_depth - 1, is_chance_node=True)
@@ -55,18 +38,7 @@ def expectimax_decision(mat, depth: int = 4):
 
     return best_move
 
-
-# -----------------------------
-# Core Expectimax
-# -----------------------------
-
 def _expectimax_value(grid, depth: int, is_chance_node: bool):
-    """
-    Recursive expectimax evaluation.
-    - grid: current board (list[list[int]])
-    - depth: remaining depth
-    - is_chance_node: if True, we aggregate over random tile spawns; else we choose best move.
-    """
     if depth == 0:
         return _evaluate(grid)
 
@@ -76,9 +48,6 @@ def _expectimax_value(grid, depth: int, is_chance_node: bool):
             # No spawn possible; just evaluate
             return _evaluate(grid)
 
-        # In the user's logic.py, add_new_2 only spawns 2s.
-        # We'll model that exactly. If you later
-        # add 4s in logic.py, adjust `candidates` accordingly (e.g., [(2, 0.9), (4, 0.1)]).
         candidates = [(2, 0.9), (4, 0.1)]
 
         expected = 0.0
@@ -106,19 +75,7 @@ def _expectimax_value(grid, depth: int, is_chance_node: bool):
         return best if best != -math.inf else _evaluate(grid)
 
 
-# -----------------------------
-# Heuristic Evaluation
-# -----------------------------
-
 def _evaluate(grid) -> float:
-    """
-    Heuristic score combining several signals known to work well for 2048:
-    - number of empty cells (more flexibility)
-    - max tile magnitude (encourages growth)
-    - monotonicity along rows/cols (encourages sorted, snake-like boards)
-    - smoothness (neighboring cells similar -> easier merges)
-    - corner bias for max tile (keeps big tile parked)
-    """
     empties = len(_empty_cells(grid))
     max_tile = max(max(row) for row in grid)
 
@@ -149,10 +106,6 @@ def _empty_cells(grid):
 
 
 def _monotonicity(grid) -> float:
-    """
-    Reward boards that are monotonic along rows/cols (values steadily increase or decrease).
-    We compute both directions and take the maximum for rows and columns.
-    """
     def line_score(line):
         # Convert tiles to logs to stabilize magnitudes
         logs = [math.log(v, 2) if v > 0 else 0 for v in line]
@@ -166,9 +119,6 @@ def _monotonicity(grid) -> float:
 
 
 def _smoothness(grid) -> float:
-    """
-    Penalize large differences between neighboring tiles.
-    """
     penalty = 0.0
     for i in range(4):
         for j in range(4):
@@ -182,11 +132,6 @@ def _smoothness(grid) -> float:
             if i + 1 < 4 and grid[i+1][j] != 0:
                 penalty += abs(v - math.log(grid[i+1][j], 2))
     return -penalty / 16.0
-
-
-#def _max_in_corner_bonus(grid, max_tile) -> float:
-    # prefer bottom-right corner specifically
-   # return 1.0 if grid[0][0] == max_tile else 0.0
 
 def _max_in_corner_bonus(grid, max_tile) -> float:
     corners = [(0,0), (0,3), (3,0), (3,3)]

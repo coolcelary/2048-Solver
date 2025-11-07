@@ -1,5 +1,4 @@
 import logic
-import AI_Solver
 import AI_Test
 import sys
 import time
@@ -37,13 +36,6 @@ if __name__ == '__main__':
     mat = logic.start_game()
 
     mode = input("Type 'ai' to make computer play game. Type anything else to play manually.").lower()
-    if mode != 'ai':
-        # printing controls for user
-        print("Commands are as follows : ")
-        print("'W' or 'w' : Move Up")
-        print("'S' or 's' : Move Down")
-        print("'A' or 'a' : Move Left")
-        print("'D' or 'd' : Move Right")
 
 
     while True:
@@ -52,12 +44,8 @@ if __name__ == '__main__':
         for row in mat:
             print('\t'.join(str(num) for num in row))
         print()
-        if mode == 'ai':
-            x = AI_Test.expectimax_decision(mat)
-            #time.sleep(0.05)
-        else:
-            print("Press a key (W/A/S/D to move, Q to quit): ", end='', flush=True)
-            x = get_key()
+        x = AI_Test.expectimax_decision(mat)
+        #time.sleep(0.05)
         
         print(x.upper())
 
@@ -98,4 +86,3 @@ if __name__ == '__main__':
         elif status == 'LOST':
             print("\nNo more moves left. Game Over!")
             break
-        time.sleep(0.1)
