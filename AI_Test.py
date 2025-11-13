@@ -14,12 +14,12 @@ def expectimax_decision(mat, depth: int = 4):
     best_score = -math.inf
 
     empty_count = len(_empty_cells(mat))
-    if empty_count > 6:
+    if empty_count > 8:
+        max_depth = 3
+    elif empty_count > 4:
         max_depth = 4
-    elif empty_count > 3:
-        max_depth = 5
     else:
-        max_depth = 6
+        max_depth = 5
 
 
     for move_key, move_fn in moves.items():
@@ -61,7 +61,7 @@ def _expectimax_value(grid, depth: int, is_chance_node: bool):
         return expected
 
     else:
-        # Max (player) node: try all moves and take the best value
+        # Max node try all moves and take the best value
         best = -math.inf
         for move_fn in (logic.move_up, logic.move_left, logic.move_down, logic.move_right):
             tmp = copy.deepcopy(grid)
@@ -79,20 +79,19 @@ def _evaluate(grid) -> float:
     empties = len(_empty_cells(grid))
     max_tile = max(max(row) for row in grid)
 
-    # Normalize logs to keep scales reasonable
     log_max = math.log(max_tile, 2) if max_tile > 0 else 0
 
     mono = _monotonicity(grid)
     smooth = _smoothness(grid)
     corner = _max_in_corner_bonus(grid, max_tile)
 
-    # Weighted sum (tuned with simple trial; feel free to tweak)
+    # Weights
     return (
-        12.0 * empties +
-        2.0  * log_max +
-        1.8  * mono +
-        0.3  * smooth +
-        8.0  * corner
+        10.0 * empties +
+        3.0  * log_max +
+        2.5  * mono +
+        0.5  * smooth +
+        12.0  * corner
     )
 
 
@@ -111,7 +110,7 @@ def _monotonicity(grid) -> float:
         logs = [math.log(v, 2) if v > 0 else 0 for v in line]
         inc = sum(max(0, logs[i] - logs[i+1]) for i in range(3))  # decreasing
         dec = sum(max(0, logs[i+1] - logs[i]) for i in range(3))  # increasing
-        return -min(inc, dec)  # penalize the "less monotone" direction
+        return -min(inc, dec)
 
     rows = sum(line_score(row) for row in grid)
     cols = sum(line_score([grid[r][c] for r in range(4)]) for c in range(4))
