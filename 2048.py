@@ -1,5 +1,5 @@
 import logic
-import AI_Test
+import AI
 import sys
 import time
 import os
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         for row in mat:
             print('\t'.join(str(num) for num in row))
         print()
-        x = AI_Test.expectimax_decision(mat)
+        x = AI.expectimax_decision(mat)
         #time.sleep(0.05)
         
         print(x.upper())
